@@ -20,19 +20,18 @@
 
 
 <script>
+import axios from "axios"
 import todoStat from '@/components/todoStat.vue'
 import todoList from '@/components/todoList.vue'
 import formAdd from '@/components/formAdd.vue'
 import vueInput from '@/components/UI/myInput.vue'
 import vueSelect from '@/components/UI/mySelected.vue'
 import lifecycle  from '@/components/mixins/lifeCycle.js'
-const STORAGE_KEY = 'todo_storage'
 
 export default ({
     name: 'todo-section',
     setup(instance) {
         lifecycle(instance)
-
         return {};
     },
     components: {
@@ -50,52 +49,59 @@ export default ({
             editClickCheck: false,
         }
     },
-    created() {
-        this.todoItems = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
-    },
+    async created() {
+    try {
+      const res = await axios.get(`http://localhost:3000/tasks`);
+      this.todoItems = res.data;
+      console.log(this.todoItems);
+    } catch (error) {
+      console.log(error);
+    }
+  },
     methods: {
-        changeState(item) {
-            item.done = !item.done;
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(this.todoItems));
+        async changeState(item) {
+            try {
+                await axios.patch(`${`http://localhost:3000/tasks`}/${item.id}`, {
+                done: !item.done,
+                updated: new Date(),
+                });
+                item.done = !item.done;
+                item.updated = new Date();
+            } catch (error) {
+                console.error(error);
+            }
         },
-        addNewTodo(item) {
-            this.todoItems.push(item);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(this.todoItems));
+        async addNewTodo(item) {
+            const res = await axios.post(`http://localhost:3000/tasks`, {
+                id: new Date(),
+                title: item.title,
+                desc: item.desc,
+                created: new Date(),
+                updated: new Date(),
+                done: false,
+            });
+            this.todoItems = [...this.todoItems, res.data];
         },
-        removeItem(item) {
+        async removeItem(item) {
+            axios.delete(`http://localhost:3000/tasks/${item.id}`);
             this.todoItems = this.todoItems.filter(i => i.id !== item.id);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(this.todoItems));
         },
-        changeText(item) {
-            this.editClickCheck = !this.editClickCheck;
+        async changeText(item) {
             let id = item.id
             let idString = id.toString();
             let element = document.getElementById(idString);
-            let editedTaskText = element.childNodes[0].innerText;
-            let editFormText = document.createElement('input');
-            editFormText.value = editedTaskText;
-
-            if (this.editClickCheck == true) {
-                element.childNodes[0].style.display = 'none';
-                element.prepend(editFormText);
+            try {
+                await axios.patch(`${`http://localhost:3000/tasks`}/${item.id}`, {
+                title: element.childNodes[0].innerText,
+                desc:  element.childNodes[1].innerText,
+                updated: new Date(),
+                });
+                item.title = element.childNodes[0].innerText;
+                item.desc = element.childNodes[1].innerText;
+                item.updated = new Date();
+            } catch (error) {
+                console.error(error);
             }
-
-            if (this.editClickCheck == false) {
-                this.todoItems.filter((todo) => todo.id == id)[0].text = editFormText.value
-                element.childNodes[0].style.display = 'inline-block'
-                if (editFormText.value == editedTaskText) {
-                //   element.childNodes[0].remove();
-                }
-            }
-
-            editFormText.onblur = () => {
-                this.todoItems.filter((todo) => todo.id == id)[0].text = editFormText.value
-                element.childNodes[1].style.display = 'inline-block'
-                editFormText.remove();
-                this.editClickCheck == false;
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(this.todoItems));
-            }
-
         }
     },
 })

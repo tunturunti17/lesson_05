@@ -1,9 +1,12 @@
 <template>
     <li class="list-group-item" :item="item"
     style="cursor:pointer" :id="item.id">
-        <p 
-        style="display: inline-block; margin-left: 5px;" :item="item"
-        :v-text="item.text">{{ item.text }}</p>
+        <div
+            style="display: inline-block; margin-left: 5px; font-weight: 700" :item="item"
+            contenteditable="true">{{ item.title }}</div>
+        <div
+            style="display: inline-block; margin-left: 5px;" :item="item"
+            contenteditable="true">{{ item.desc }}</div>
         <todo-btns :item="item"
         :editclickcheck="editclickcheck"
         @changestate="$emit('changestate', item)"

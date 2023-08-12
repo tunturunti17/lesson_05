@@ -37,7 +37,7 @@ import todoItem from '@/components/todoItem.vue'
         },
         methods: {
             searchTask() {
-                return this.todoitems.filter(todoItem => todoItem.text.toLowerCase().includes(this.searchquery))
+                return this.todoitems.filter(todoItem => todoItem.title.toLowerCase().includes(this.searchquery))
             },
         },
         computed: {

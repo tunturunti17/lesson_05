@@ -4,8 +4,7 @@ import axios from "axios";
 
 const routes = [
   {
-    path: '/',
-    name: 'homeComponent',
+    path: '',
     component: HomeComponent
   },
   {
@@ -24,6 +23,7 @@ const routes = [
   },
   {
     path: '/tasklist/:id',
+    name: "taskId",
     component: () => import('../views/taskComponentIdPage.vue'),
     props: true,
     async beforeEnter(to, from, next) {
@@ -38,9 +38,5 @@ const routes = [
   }
 ]
 
-const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
-  routes
-})
-
-export default router
+const router = createRouter({ history: createWebHistory(), routes });
+export default router;

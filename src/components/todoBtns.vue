@@ -14,7 +14,7 @@
         <vue-btn type="button"
             class="btn btn-info"
             :item="item"
-            @click="$router.push(`/tasklist/${item.id}`)">task page
+            @click="$router.push({ path: `/tasklist/${item.id}`, query: { desc: item.desc }})">task page
         </vue-btn>
         <vue-btn type="button"
             class="btn btn-danger"

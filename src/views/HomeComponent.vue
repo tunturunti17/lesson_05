@@ -35,6 +35,9 @@ export default {
       auth: false,
     };
   },
+  created() {
+    this.getAuth();
+  },
   methods: {
     async login() {
       try {

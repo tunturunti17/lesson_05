@@ -5,14 +5,14 @@
     <vue-input type="text"
         class="form-control" 
         placeholder="Search task"
-        v-model="searchQuery">
+        :model-value="searchQuery"
+        @update:model-value="setSearchQuery">
     </vue-input>
-    <vue-select v-mousemove v-model="filterSelect"></vue-select>
+    <vue-select :model-value="filterSelect"
+        @update:model-value="setFilterSelect"></vue-select>
     <todo-list :todoitems="todoItems" 
         @changestate="changeState"
         :editclickcheck="editClickCheck"
-        :filterselect="filterSelect"
-        :searchquery="searchQuery"
         @remove="removeItem"
         @changetext="changeText"
     ></todo-list>
@@ -21,6 +21,7 @@
 
 <script>
 import axios from "axios"
+import { mapMutations, mapGetters, mapState } from "vuex"
 import todoStat from '@/components/todoStat.vue'
 import todoList from '@/components/todoList.vue'
 import formAdd from '@/components/formAdd.vue'
@@ -43,22 +44,16 @@ export default ({
     },
     data: function() {
         return {
-            todoItems: [],
-            filterSelect: "all",
-            searchQuery: "",
-            editClickCheck: false,
         }
     },
     async created() {
-    try {
-      const res = await axios.get(`http://localhost:3000/tasks`);
-      this.todoItems = res.data;
-      console.log(this.todoItems);
-    } catch (error) {
-      console.log(error);
-    }
-  },
+        this.$store.dispatch('fetchTasks')
+    },
     methods: {
+        ...mapMutations({
+            setSearchQuery: 'setSearchQuery',
+            setFilterSelect: 'setFilterSelect'
+        }),
         async changeState(item) {
             try {
                 await axios.patch(`${`http://localhost:3000/tasks`}/${item.id}`, {
@@ -104,5 +99,15 @@ export default ({
             }
         }
     },
+    computed: {
+        ...mapGetters({
+            searchTask: 'searchTask',
+            filterTask: 'filterTask'
+        }),
+        ...mapState({
+            filterSelect: state => state.filterSelect,
+            searchQuery: state => state.searchQuery
+        })
+    }
 })
 </script>

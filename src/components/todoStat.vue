@@ -15,33 +15,19 @@
 
 <script>
 import vueBtn from '@/components/UI/myButton.vue'
+import { mapGetters } from "vuex"
     export default {
         name: 'todo-stat',
         components: {
             vueBtn
         },
-        props: {
-            todoitems: {
-                type: Array,
-            }
-        },
         computed: {
-            completedTasks() {
-                let tasksDone=[];
-                this.todoitems.forEach(item => tasksDone.push(item.done));
-                return tasksDone.filter(function(value){return value}).length;
-            },
-            allTasks() {
-                let tasksDone=[];
-                this.todoitems.forEach(item => tasksDone.push(item.done));
-                return tasksDone.length;
-            },
-            percentComplete(){
-                let tasksDone=[];
-                this.todoitems.forEach(item => tasksDone.push(item.done));
-                return ( (Math.round(((tasksDone.filter(function(value){return value}).length / tasksDone.length) * 100)*10)/10) || '0')
-            },
-        },
+            ...mapGetters({
+                completedTasks: 'completedTasks',
+                allTasks: 'allTasks',
+                percentComplete: 'percentComplete'
+            })
+        }
     }
 </script>
 

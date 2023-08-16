@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeComponent from '../views/HomeComponent.vue'
-import axios from "axios";
+import store from '@/store'
 
 const routes = [
   {
@@ -17,8 +17,9 @@ const routes = [
     name: 'tasklistComponent',
     component: () => import('../views/TaskListComponent.vue'),
     async beforeEnter(to, from, next) {
-      const res = await axios.get(`http://localhost:3000/auth`);
-      if (res.data.auth) next();
+      if (store.state.auth) {
+        next()
+      } next('/')
     },
   },
   {
@@ -27,8 +28,7 @@ const routes = [
     component: () => import('../views/taskComponentIdPage.vue'),
     props: true,
     async beforeEnter(to, from, next) {
-      const res = await axios.get(`http://localhost:3000/auth`);
-      if (res.data.auth) next();
+      if (store.state.auth) next();
     },
   },
   {

@@ -6,14 +6,21 @@ export default createStore({
         async fetchTasks({commit}) {
               const res = await axios.get(`http://localhost:3000/tasks`);
               commit('setTodoItems', res.data);
+        },
+        login({commit}) {
+            commit('setAuth');
         }
     },
     state: () => ({
         todoItems: [],
         filterSelect: "all",
         searchQuery: "",
+        auth: false,
     }),
     getters: {
+        getAuth(state) {
+            return state.auth
+        },
         searchTask(state) {
             return state.todoItems.filter(todoItem => todoItem.title.toLowerCase().includes(state.searchQuery))
         },
@@ -52,6 +59,9 @@ export default createStore({
         },
         setSearchQuery(state, searchQuery) {
             state.searchQuery = searchQuery
+        },
+        setAuth(state) {
+            state.auth = !state.auth
         }
     },
     modules: {

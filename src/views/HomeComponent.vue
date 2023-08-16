@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <div class="w-25 mx-auto border p-3" style="margin-top: 15%">
-      <form v-if="!auth" @submit.prevent="login">
+      <form v-if="!getAuth" @submit.prevent="login">
         <div class="mb-3">
           <label class="form-label" for="username">Логин:</label>
           <input class="form-control" v-model="username" type="text" id="username" placeholder="Логин...">
@@ -15,7 +15,7 @@
         </vue-btn>
       </form>
       <vue-btn class="btn btn-primary"
-        v-if="auth" @click="login">Выйти
+        v-if="getAuth" @click="login">Выйти
       </vue-btn>
     </div>
   </div>
@@ -23,7 +23,7 @@
 
 <script>
 import vueBtn from '@/components/UI/myButton.vue'
-import axios from "axios"
+import { mapMutations, mapGetters } from "vuex"
 
 export default {
   name: 'HomeComponent',
@@ -32,33 +32,22 @@ export default {
   },
   data() {
     return {
-      auth: false,
     };
   },
-  created() {
-    this.getAuth();
-  },
   methods: {
-    async login() {
-      try {
-        await axios.patch(`${`http://localhost:3000/auth`}`, {
-          auth: !this.auth,
-        });
-        this.auth = !this.auth;
-      } catch (error) {
-        console.error(error);
-      }
-      await this.$router.push({ path: "/tasklist" });
-    },
-    async getAuth() {
-      try {
-        const res = await axios.get(`http://localhost:3000/auth`);
-        this.auth = res.data.auth;
-      } catch (error) {
-        console.log(error);
-      }
-    },
+    ...mapMutations({
+            setAuth: 'setAuth',
+        }),
+        login() {
+          this.$store.dispatch('login');
+          this.$router.push({path: '/tasklist'});
+        }
   },
+  computed: {
+        ...mapGetters({
+          getAuth: 'getAuth'
+        }),
+    }
 }
 </script>
 <style scoped>

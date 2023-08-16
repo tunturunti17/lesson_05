@@ -18,7 +18,9 @@ const routes = [
     component: () => import('../views/TaskListComponent.vue'),
     async beforeEnter(to, from, next) {
       const res = await axios.get(`http://localhost:3000/auth`);
-      if (res.data.auth) next();
+      if (res.data.auth) {
+        next()
+      } next('/')
     },
   },
   {

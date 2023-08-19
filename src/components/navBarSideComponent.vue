@@ -1,6 +1,6 @@
 <template>
     <ul class="navbar navbar-dark bg-dark navbar-nav">
-      <li class="nav-item" :key="task" v-for="task in items">
+      <li class="nav-item" :key="task" v-for="task in getItems">
         <router-link
           class="nav-link"
           active-class="active"
@@ -16,7 +16,6 @@
   </template>
   
   <script>
-  import axios from "axios";
   export default {
     name: "NavSideBarComponent",
     data() {
@@ -24,14 +23,11 @@
         items: [],
       };
     },
-    async created() {
-      try {
-        const res = await axios.get(`http://localhost:3000/tasks`);
-        this.items = res.data;
-      } catch (error) {
-        console.log(error);
+    computed: {
+      getItems() {
+        return this.$store.getters.getTasks
       }
-    },
+    }
   };
   </script>
   

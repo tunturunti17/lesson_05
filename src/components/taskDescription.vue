@@ -43,26 +43,16 @@
       };
     },
     async created() {
-      try {
-        const res = await axios.get(`http://localhost:3000/tasks/${this.id}`);
-        this.item = res.data;
-        console.log(this.item);
-      } catch (error) {
-        console.log(error);
-      }
+      this.item = this.$store.getters.getTasks.filter(
+      (item) => item.id == this.id
+    )[0];
     },
     watch: {
       async "$route.path"() {
-        try {
-          const res = await axios.get(
-            `http://localhost:3000/tasks/${this.$route.params.id}`
-          );
-          this.item = res.data;
-          console.log(this.item);
-        } catch (error) {
-          console.log(error);
-        }
-      },
+      this.item = this.$store.getters.getTasks.filter(
+        (item) => item.id == this.$route.params.id
+      )[0];
+    },
     },
     methods: {
       async removeItem() {

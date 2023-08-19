@@ -9,7 +9,39 @@ export default createStore({
         },
         login({commit}) {
             commit('setAuth');
-        }
+        },
+        async addNewTodo({commit}, playload) {
+            const res = await axios.post(`http://localhost:3000/tasks`, {
+                id: new Date(),
+                title: playload[0],
+                desc: playload[1],
+                created: new Date(),
+                updated: new Date(),
+                done: false,
+            });
+            commit('addItem', res.data);
+        },
+        async updateDone({commit}, playload) {
+            const res = await axios.patch(
+              `${`http://localhost:3000/tasks`}/${playload[0]}`,
+              {
+                done: !playload[1],
+                updated: new Date(),
+              }
+            );
+            commit("setDone", res.data);
+          },
+          async updateTask({commit}, playload) {
+            const res = await axios.patch(
+              `${`http://localhost:3000/tasks`}/${playload[0]}`,
+              {
+                title: playload[1],
+                desc: playload[2],
+                updated: new Date(),
+              }
+            );
+            commit("setTask", res.data);
+          },
     },
     state: () => ({
         todoItems: [],
@@ -17,10 +49,41 @@ export default createStore({
         searchQuery: "",
         auth: false,
     }),
+    mutations: {
+        setTodoItems(state, todoItems) {
+            state.todoItems = todoItems
+        },
+        addItem(state, item) {
+            state.todoItems.push(item);
+        },
+        setFilterSelect(state, filterSelect) {
+            state.filterSelect = filterSelect
+        },
+        setSearchQuery(state, searchQuery) {
+            state.searchQuery = searchQuery
+        },
+        setAuth(state) {
+            state.auth = !state.auth
+        },
+        setDone(state, task) {
+            const stateTask = state.todoItems.find((item) => item.id === task.id);
+            stateTask.done = task.done;
+            stateTask.updated = new Date();
+        },
+        setTask(state, task) {
+            const stateTask = state.todoItems.find((item) => item.id === task.id);
+            stateTask.title = task.title;
+            stateTask.desc = task.desc;
+            stateTask.updated = new Date();
+        },
+    },
     getters: {
         getAuth(state) {
             return state.auth
         },
+        getTasks(state) {
+            return state.todoItems;
+          },
         searchTask(state) {
             return state.todoItems.filter(todoItem => todoItem.title.toLowerCase().includes(state.searchQuery))
         },
@@ -50,21 +113,4 @@ export default createStore({
             return ( (Math.round(((tasksDone.filter(function(value){return value}).length / tasksDone.length) * 100)*10)/10) || '0')
         },
     },
-    mutations: {
-        setTodoItems(state, todoItems) {
-            state.todoItems = todoItems
-        },
-        setFilterSelect(state, filterSelect) {
-            state.filterSelect = filterSelect
-        },
-        setSearchQuery(state, searchQuery) {
-            state.searchQuery = searchQuery
-        },
-        setAuth(state) {
-            state.auth = !state.auth
-        }
-    },
-    modules: {
-
-    }
 });

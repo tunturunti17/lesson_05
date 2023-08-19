@@ -1,5 +1,5 @@
 <template>
-    <form class="input-group" @submit.prevent>
+    <form class="input-group" @submit.prevent="addNewTodoItem">
   <vue-input 
     placeholder="Add Title for new task" 
     v-model="item.title"></vue-input>
@@ -8,7 +8,7 @@
     v-model="item.desc"></vue-input>
   <vue-btn class="btn-outline-secondary"
   type="submit" id="button-addon2"
-  @click="addNewTodo"
+
   :disabled="(item.title.length == 0) || (item.desc.length == 0)">Add</vue-btn>
   </form>
 </template>
@@ -37,15 +37,11 @@ import vueInput from '@/components/UI/myInput.vue'
             }
         },
         methods: {
-            addNewTodo() {
-                this.item.id = Date.now();
-                this.item.created = new Date();
-                this.item.updated = new Date();
-                this.$emit('create', this.item)
+            addNewTodoItem() {
+                this.$store.dispatch('addNewTodo', [this.item.title, this.item.desc]);
                 this.item = {
                     title:'',
                     desc:'',
-                    done: false
                 }
             }
         }

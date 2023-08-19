@@ -1,21 +1,27 @@
 <template>
     <div class="container-md">
-      <div ref="title" contenteditable="true" style="font-weight: 700">Title: {{ item.title }}</div>
-      <div ref="desc" contenteditable="true">Description: {{ $route.query.desc }}</div>
+      <div class="container-sm">
+        <p style="font-weight: 700">Title:</p>
+        <div ref="title" contenteditable="true"> {{ item.title }}</div>
+      </div>
+      <div class="container-sm">
+        <p>Description:</p>
+        <div ref="desc" contenteditable="true"> {{ $route.query.desc }}</div>
+      </div>
       <p>Create date: {{ item.created }}</p>
       <p>Update date: {{ item.updated }}</p>
       <vue-btn
         type="button"
         class="btn"
         :class="[item.done ? 'btn-success' : 'btn-secondary']"
-        v-on:click="changeState"
+        @click="changeState(item)"
       >
         {{ item.done ? 'completed' : 'in order' }}
       </vue-btn>
-      <vue-btn type="button" class="btn btn-danger" v-on:click="removeItem">
+      <vue-btn type="button" class="btn btn-danger" @click="removeItem">
         Remove
       </vue-btn>
-      <vue-btn type="button" class="btn btn-info" v-on:click="changeText">
+      <vue-btn type="button" class="btn btn-info" @click="changeText">
         Edit
       </vue-btn>
     </div>
@@ -63,29 +69,15 @@
         axios.delete(`http://localhost:3000/tasks/${this.id}`);
         this.$router.push({ path: "/tasklist" });
       },
-      async changeState() {
-        try {
-          await axios.patch(`${`http://localhost:3000/tasks`}/${this.id}`, {
-            done: !this.item.done,
-            updated: new Date(),
-          });
-          this.item.done = !this.item.done;
-          this.item.updated = new Date();
-        } catch (error) {
-          console.error(error);
-        }
+      async changeState(item) {
+        this.$store.dispatch("updateDone", [item.id, item.done]);
       },
       async changeText() {
-        try {
-          await axios.patch(`${`http://localhost:3000/tasks`}/${this.id}`, {
-            title: this.$refs.title.innerText,
-            desc: this.$refs.desc.innerText,
-          });
-          this.item.title = this.$refs.title.innerText;
-          this.item.desc = this.$refs.desc.innerText;
-        } catch (error) {
-          console.error(error);
-        }
+        this.$store.dispatch("updateTask", [
+          this.id,
+          this.$refs.title.innerText,
+          this.$refs.desc.innerText,
+        ]);
       },
     },
   };
@@ -100,6 +92,16 @@
 
   .btn {
     margin: 7px;
+  }
+
+  p {
+    margin-bottom: 2px;
+  }
+
+  .container-sm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   </style>
   
